@@ -1,7 +1,7 @@
 {
   "name": "changecontrol",
   "preferGlobal": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Stephen Cresswell <scresswell@acuminous.co.uk>",
   "description": "a change control library for node",
   "repository": {
@@ -13,11 +13,11 @@
     "change control"
   ],
   "dependencies": {
-      "async": "0.2.x",
-      "colors": "0.6.x",
-      "optimist":"0.3.x",
-      "redis": "0.7.x",
-      "underscore": "1.4.x"
+    "async": "0.2.x",
+    "colors": "0.6.x",
+    "optimist": "0.3.x",
+    "redis": "0.7.x",
+    "underscore": "1.4.x"
   },
   "devDependencies": {
     "mocha": "1.8.x"
@@ -26,10 +26,12 @@
     "test": "make test"
   },
   "analyze": false,
-  "license" : [{
-    "type": "Apache",
-    "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-  }],
+  "license": [
+    {
+      "type": "Apache",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
   "engines": {
     "node": ">=0.6"
   }

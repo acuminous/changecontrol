@@ -1,6 +1,6 @@
 {
   "name": "changecontrol",
-  "preferGlobal": true,
+  "preferGlobal": false,
   "version": "0.0.2",
   "author": "Stephen Cresswell <scresswell@acuminous.co.uk>",
   "description": "a change control library for node",

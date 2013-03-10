@@ -1,7 +1,9 @@
 var rootpath = process.cwd() + '/',
     _ = require('underscore'),
+    async = require('async'),    
     path = require('path'),
-    ChangeControl = require(rootpath + 'lib/ChangeControl').ChangeControl
+    fs = require("fs"),
+    ChangeControl = require(rootpath + 'lib/ChangeControl').ChangeControl;
 
 var argv = processArgs();
 var redis = require('redis').createClient();
@@ -9,16 +11,15 @@ var changeControl = ChangeControl(redis, { logger: console });
 var changeLog = changeControl.changeLog();
 var mode = argv.m;
 var changeId = argv.c;
-
-var changeSet = require('./changes/release-1.0').changeSet(changeControl, redis);
+var changeSets = getChangeSets();
 
 var api = {
 	'clear': _.partial(changeLog.clear, changeId),
 	'dump': _.partial(changeLog.dump),
 	'unlock': _.partial(changeLog.unlock, true),
-	'pretend': _.partial(changeSet.pretend, changeId),
-	'execute': _.partial(changeSet.execute, changeId),
-	'sync': _.partial(changeSet.sync, changeId)
+	'pretend': executeChangeSets,
+	'execute': executeChangeSets,
+	'sync': executeChangeSets
 }
 
 var operation = api[mode];
@@ -32,6 +33,19 @@ operation(function(err) {
 	else console.info("Finished");
 	process.exit(err ? 1 : 0);					
 })
+
+function getChangeSets() {
+  var baseDir = __dirname + "/changes/";
+  return _.reduce(fs.readdirSync(baseDir), function(results, file) {
+    return results.concat(require(baseDir + file).changeSet(changeControl, redis))
+  }, [])
+};
+
+function executeChangeSets(next) {
+  async.eachSeries(changeSets, function(changeSet, callback) {
+    changeSet[mode](changeId, callback)
+  }, next)
+}
 
 function processArgs() {
 	return require('optimist')

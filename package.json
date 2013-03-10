@@ -10,7 +10,9 @@
   },
   "keywords": [
     "change management",
-    "change control"
+    "change control",
+    "liquibase",
+    "dbdeploy"
   ],
   "dependencies": {
     "async": "0.2.x",

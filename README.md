@@ -23,52 +23,60 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 
 1. Create a ChangeSet
 
-  // changes/release-1.0.js
-  exports.changeSet = function(changeControl, redis) {
+```js
+// changes/release-1.0.js
+exports.changeSet = function(changeControl, redis) {
 
-    var changeSet = changeControl.changeSet('release-1.0');     
+  var changeSet = changeControl.changeSet('release-1.0');     
 
-    changeSet.add('init:pirates', function(next) {
-      var multi = redis.multi();
-      multi.mset(
-        'Blackbeard', 'Queen Anne\'s Revenge',          
-        'Long John Silver', 'Hispaniola'
-      );
-      multi.exec(next);
-    });
+  changeSet.add('init:pirates', function(next) {
+    var multi = redis.multi();
+    multi.mset(
+      'Blackbeard', 'Queen Anne\'s Revenge',          
+      'Long John Silver', 'Hispaniola'
+    );
+    multi.exec(next);
+  });
 
-    return changeSet;
-  };  
+  return changeSet;
+};  
+```
 
 2. Initialise ChangeControl
-
+```js
   var changeControl = ChangeControl(redis, { logger: console });
+```
 
 3. Require the ChangeSet
-
+```js
   var changeSet = require('changes/release-1.0').changeSet(changeControl, redis);
+```
 
 4. Execute the ChangeSet
-
+```js
   changeSet.execute('*', function(err) {
     console.log("Piece of Eight");
   })
+```
 
 In practice you'll (hopefully) want to execute all the ChangeSets found in the 'changes' directory automatically when your application starts. You'll probabably also want a script for testing the changes locally and for unlocking the ChangeLog when something unexpected happens. You'll find a starter for ten in the examples folder.
 
 ### Targetting specific changes
 You may have noticed the odd '*' parameter to the changeSet.execute method. This tells the ChangeSet to execute every change. You can change this parameter to be more specific about the change(s) you want to execute, e.g.
 
+```js
   changeSet.execute('init:pirates', function(err) {
     console.log("Piece of Eight");
   })
+```
 
 Would execute just the 'init:pirates'. The sync, pretend and clear operations also expect a similar first paramted.
 
 ### Run Always
 Sometimes you'll want to run a Change everytime your application starts (e.g. backing up log files). You can do this by specifying frequency = 'always' when you define your Change, e.g.
 
+```js
   changeSet.add('init:pirates', function(next) {
     // Change Code
   }, { frequency: 'always'});
-
+```

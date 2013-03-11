@@ -43,16 +43,19 @@ exports.changeSet = function(changeControl, redis) {
 ```
 
 2. Initialise ChangeControl
+
 ```js
 var changeControl = ChangeControl(redis, { logger: console });
 ```
 
 3. Require the ChangeSet
+
 ```js
 var changeSet = require('changes/release-1.0').changeSet(changeControl, redis);
 ```
 
 4. Execute the ChangeSet
+
 ```js
 changeSet.execute('*', function(err) {
   console.log("Piece of Eight");

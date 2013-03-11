@@ -26,18 +26,18 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 // changes/release-1.0.js
 exports.changeSet = function(changeControl, redis) {
 
-  var changeSet = changeControl.changeSet('release-1.0');     
+    var changeSet = changeControl.changeSet('release-1.0');     
 
-  changeSet.add('init:pirates', function(next) {
-    var multi = redis.multi();
-    multi.mset(
-      'Blackbeard', 'Queen Anne\'s Revenge',          
-      'Long John Silver', 'Hispaniola'
-    );
-    multi.exec(next);
-  });
+    changeSet.add('init:pirates', function(next) {
+        var multi = redis.multi();
+        multi.mset(
+            'Blackbeard', 'Queen Anne\'s Revenge',          
+            'Long John Silver', 'Hispaniola'
+        );
+        multi.exec(next);
+    });
 
-  return changeSet;
+    return changeSet;
 };  
 ```
 1. Initialise ChangeControl
@@ -51,7 +51,7 @@ var changeSet = require('changes/release-1.0').changeSet(changeControl, redis);
 1. Execute the ChangeSet
 ```js
 changeSet.execute('*', function(err) {
-  console.log("Piece of Eight");
+    console.log("Piece of Eight");
 })
 ```
 
@@ -62,7 +62,7 @@ You may have noticed the odd '*' parameter to the changeSet.execute method. This
 
 ```js
 changeSet.execute('init:pirates', function(err) {
-  console.log("Piece of Eight");
+    console.log("Piece of Eight");
 })
 ```
 
@@ -73,6 +73,6 @@ Sometimes you'll want to run a Change everytime your application starts (e.g. ba
 
 ```js
 changeSet.add('init:pirates', function(next) {
-  // Change Code
+    // Change Code
 }, { frequency: 'always'});
 ```

@@ -22,7 +22,6 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 ## Usage
 
 1. Create a ChangeSet
-
 ```js
 // changes/release-1.0.js
 exports.changeSet = function(changeControl, redis) {
@@ -41,21 +40,15 @@ exports.changeSet = function(changeControl, redis) {
   return changeSet;
 };  
 ```
-
-2. Initialise ChangeControl
-
+1. Initialise ChangeControl
 ```js
 var changeControl = ChangeControl(redis, { logger: console });
 ```
-
-3. Require the ChangeSet
-
+1. Require the ChangeSet
 ```js
 var changeSet = require('changes/release-1.0').changeSet(changeControl, redis);
 ```
-
-4. Execute the ChangeSet
-
+1. Execute the ChangeSet
 ```js
 changeSet.execute('*', function(err) {
   console.log("Piece of Eight");

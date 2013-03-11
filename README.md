@@ -72,7 +72,7 @@ Would execute just the 'init:pirates'. The sync, pretend and clear operations al
 Sometimes you'll want to run a Change everytime your application starts (e.g. backing up log files). You can do this by specifying frequency = 'always' when you define your Change, e.g.
 
 ```js
-changeSet.add('init:pirates', function(next) {
+changeSet.add('init:skullduggery', function(next) {
     // Change Code
 }, { frequency: 'always'});
 ```

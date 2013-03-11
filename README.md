@@ -1,5 +1,5 @@
 # ChangeControl
-ChangeControl is a tool for managing automated changes in node applications and was inspired by [liquibase][http://www.liquibase.com]. You might use it to bootstrap your application with reference data, or perform a migration prior to deploying a new release. Without tools like ChangeControl these types of change require human interaction and accumulate to the point where performing a release involves black magic. Creating a new environment requires deep magic from the dawn of time! 
+ChangeControl is a tool for managing automated changes in node applications and was inspired by [liquibase][http://www.liquibase.org]. You might use it to bootstrap your application with reference data, or perform a migration prior to deploying a new release. Without tools like ChangeControl these types of change require human interaction and accumulate to the point where performing a release involves black magic. Creating a new environment requires deep magic from the dawn of time! 
 
 ## Dependencies
 ChangeControl requires a [Redis][http://www.redis.com] instance to track which changes have been executed. We appreciate this will be a major inconvenience to others, however our project uses Redis, and we wanted something up quickly. Sorry.

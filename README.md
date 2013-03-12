@@ -5,19 +5,19 @@ ChangeControl is a tool for managing automated changes in node applications and 
 ChangeControl requires a [Redis](http://www.redis.com) instance to track which changes have been executed. We appreciate this will be a major inconvenience to others, however our project uses Redis, and we wanted something up quickly. Sorry.
 
 ## Concepts
-Before attempting to use ChangeControl it's worth spending a few minutes to understand it's concepts. At the finest granularity is a Change, which is little more than a JavaScript function and an id.
+At the finest granularity is a Change, which is little more than a JavaScript function and an id.
 
     Change = A JavaScript function + an Id
 
-You can execute changes, pretend to execute them, or record that you've executed them, even if you haven't (more on why you might want to do this later). Changes are clumped into ChangeSets. We tend to create a single ChangeSet per release.
+You can execute changes, pretend to execute them, or record that you've executed them, even if you haven't. Changes are clumped into ChangeSets. We tend to create a single ChangeSet per release.
 
     ChangeSet = A list of Changes + an Id
 
-Just like Changes, you can execute ChangeSet, pretend to execute them or just record that you have. Finally you have the ChangeLog. Every time you execute a Change a record is written to the ChangeLog. 
+Just like Changes, you can execute ChangeSets, pretend to execute them or just record that you have. Finally you have the ChangeLog. Every time you execute a Change a record is written to the ChangeLog. 
 
-    ChangeLog = A list of the changes have been executed
+    ChangeLog = A list of the changes that have been executed
 
-Once a Change has been recorded in the ChangeLog it typically won't be executed again. Furthermore if someone modifies the Change after it has been executed ChangeControl will complain loudly and fail. It would obviously be bad for two processes to execute a ChangeSet at the same time, so the ChangeLog is locked during processing. Once the ChangeSet has been fully applied, the lock is released. This leads to problems when if one of your Changes dies unexpectedly or is killed, since the ChangeLog will still be locked. If this happens you need to manually 'unlock' the ChangeLog. You can also view (dump) the ChangeLog or clear it.
+Once a Change has been recorded in the ChangeLog it typically won't be executed again. Furthermore if someone modifies the Change after it has been executed ChangeControl will complain loudly and fail. It would obviously be bad for two processes to execute a ChangeSet at the same time, so the ChangeLog is locked during processing. Once the ChangeSet has been fully applied, the lock is released. This leads to problems when if one of your Changes dies unexpectedly or is killed, since the ChangeLog will still be locked. If this happens you need to manually 'unlock' the ChangeLog. You can also 'dump' the ChangeLog or 'clear' it.
 
 ## Usage
 
@@ -28,14 +28,16 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 
         var changeSet = changeControl.changeSet('release-1.0');     
 
-        changeSet.add('init:pirates', function(next) {
-            var multi = redis.multi();
-            multi.mset(
-                'Blackbeard', 'Queen Anne\'s Revenge',          
-                'Long John Silver', 'Hispaniola'
-            );
-            multi.exec(next);
+        changeSet.add('init:pirates:captains', function(next) {
+            redis.sadd('pirates:captains', 'Blackbeard', 'Long John Silver', next);
         });
+        changeSet.add('init:pirates:ships', function(next) {
+            redis.sadd('pirates:ships', 'Queen Anne\'s Revenge', 'Long John Silver', next);
+        });        
+        changeSet.add('init:ninja:masters', function(next) {
+            redis.sadd('ninja:ships', 'Hattori Hanzo', 'Armakuni', next);
+        });        
+
 
         return changeSet;
     };  
@@ -51,28 +53,28 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 1. Execute the ChangeSet
     ```js
     changeSet.execute('*', function(err) {
-        console.log("Piece of Eight");
+        console.log("Pieces of Eight");
     })
     ```
 
 In practice you'll (hopefully) want to execute all the ChangeSets found in the 'changes' directory automatically when your application starts. You'll probabably also want a script for testing the changes locally and for unlocking the ChangeLog when something unexpected happens. You'll find a starter for ten in the examples folder.
 
 ### Targetting specific changes
-You may have noticed the odd '*' parameter to the changeSet.execute method. This tells the ChangeSet to execute every change. You can change this parameter to be more specific about the change(s) you want to execute, e.g.
+You may have noticed the odd '*' parameter to the changeSet.execute method. This tells the ChangeSet to execute every change. You can modify this parameter to be more specific about the change(s) you want to execute, e.g.
 
 ```js
-changeSet.execute('init:pirates', function(err) {
-    console.log("Piece of Eight");
+changeSet.execute('init:pirates:*', function(err) {
+    console.log("Pieces of Eight");
 })
 ```
 
-Would execute just the 'init:pirates'. The sync, pretend and clear operations also expect a similar first paramted.
+Would execute 'init:pirates:captains' and 'init:pirates:ships', but not 'init:ninja:masters'. The sync, pretend and clear operations also expect a similar first parameter.
 
 ### Run Always
 Sometimes you'll want to run a Change everytime your application starts (e.g. backing up log files). You can do this by specifying frequency = 'always' when you define your Change, e.g.
 
 ```js
-changeSet.add('init:skullduggery', function(next) {
+changeSet.add('backup:logs', function(next) {
     // Some Code
 }, { frequency: 'always'});
 ```

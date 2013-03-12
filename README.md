@@ -7,17 +7,17 @@ ChangeControl requires a [Redis](http://www.redis.com) instance to track which c
 ## Concepts
 Before attempting to use ChangeControl it's worth spending a few minutes to understand it's concepts. At the finest granularity is a Change, which is little more than a JavaScript function and an id.
 
-  Change = Function + Id
+    Change = A JavaScript function + an Id
 
 You can execute changes, pretend to execute them, or record that you've executed them, even if you haven't (more on why you might want to do this later). Changes are clumped into ChangeSets. We tend to create a single ChangeSet per release.
 
-  ChangeSet = A list of Changes + Id
+    ChangeSet = A list of Changes + an Id
 
 Just like Changes, you can execute ChangeSet, pretend to execute them or just record that you have. Finally you have the ChangeLog. Every time you execute a Change a record is written to the ChangeLog. 
 
-  ChangeLog = A list of the changes have been executed
+    ChangeLog = A list of the changes have been executed
 
-Once a Change has been recorded in the ChangeLog it typically won't be executed again. Further more if someone modifies the Change after it has been executed ChangeControl will complain loudly. When you start executing a ChangeSet, it will lock the ChangeLog to ensure two processes can't execute changes at the same time. Once the ChangeSet has been felly applied, the lock is released. This leads to problems when if one of your changes dies or is killed, since the ChangeLog will still be locked. If this happens you need to manually unlock the ChangeLog. You can also view (dump) the ChangeLog or clear it.
+Once a Change has been recorded in the ChangeLog it typically won't be executed again. Furthermore if someone modifies the Change after it has been executed ChangeControl will complain loudly and fail. It would obviously be bad for two processes to execute a ChangeSet at the same time, so the ChangeLog is locked during processing. Once the ChangeSet has been fully applied, the lock is released. This leads to problems when if one of your Changes dies unexpectedly or is killed, since the ChangeLog will still be locked. If this happens you need to manually 'unlock' the ChangeLog. You can also view (dump) the ChangeLog or clear it.
 
 ## Usage
 

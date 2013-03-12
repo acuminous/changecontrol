@@ -61,9 +61,9 @@ In practice you'll (hopefully) want to execute all the ChangeSets found in the '
 You may have noticed the odd '*' parameter to the changeSet.execute method. This tells the ChangeSet to execute every change. You can change this parameter to be more specific about the change(s) you want to execute, e.g.
 
 ```js
-    changeSet.execute('init:pirates', function(err) {
-        console.log("Piece of Eight");
-    })
+changeSet.execute('init:pirates', function(err) {
+    console.log("Piece of Eight");
+})
 ```
 
 Would execute just the 'init:pirates'. The sync, pretend and clear operations also expect a similar first paramted.
@@ -72,7 +72,7 @@ Would execute just the 'init:pirates'. The sync, pretend and clear operations al
 Sometimes you'll want to run a Change everytime your application starts (e.g. backing up log files). You can do this by specifying frequency = 'always' when you define your Change, e.g.
 
 ```js
-    changeSet.add('init:skullduggery', function(next) {
-        // Change Code
-    }, { frequency: 'always'});
+changeSet.add('init:skullduggery', function(next) {
+    // Change Code
+}, { frequency: 'always'});
 ```

@@ -73,7 +73,7 @@ Would execute 'init:pirates:captains' and 'init:pirates:ships', but not 'init:ni
 Sometimes you'll want to run a Change everytime your application starts (e.g. backing up log files). You can do this by specifying frequency = 'always' when you define your Change, e.g.
 
 ```js
-changeSet.add('backup:logs', function(next) {
+changeSet.add('backup:ships:log', function(next) {
     // Some Code
 }, { frequency: 'always'});
 ```

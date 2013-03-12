@@ -38,7 +38,6 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
             redis.sadd('ninja:masters', 'Hattori Hanzo', 'Armakuni', next);
         });        
 
-
         return changeSet;
     };  
     ```

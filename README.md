@@ -35,7 +35,7 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
             redis.sadd('pirates:ships', 'Queen Anne\'s Revenge', 'Long John Silver', next);
         });        
         changeSet.add('init:ninja:masters', function(next) {
-            redis.sadd('ninja:ships', 'Hattori Hanzo', 'Armakuni', next);
+            redis.sadd('ninja:masters', 'Hattori Hanzo', 'Armakuni', next);
         });        
 
 

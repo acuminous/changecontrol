@@ -1,7 +1,7 @@
 {
   "name": "changecontrol",
   "preferGlobal": false,
-  "version": "0.0.2",
+  "version": "0.0.4",
   "author": "Stephen Cresswell <scresswell@acuminous.co.uk>",
   "description": "a change control library for node",
   "main": "./lib/ChangeControl",    
@@ -26,7 +26,8 @@
     "mocha": "1.8.x"
   },
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "redis": "nohup redis-server > redis.out 2>&1 &"
   },
   "analyze": false,
   "license": [

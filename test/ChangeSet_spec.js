@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-var assert = require("assert"),
-	_ = require('underscore'),	
-	async = require('async'),
-	os = require("os"),
-	ChangeControl = require('../lib/ChangeControl').ChangeControl;
+var assert = require("assert");
+var _ = require('underscore');	
+var async = require('async');
+var os = require("os");
+var ChangeSet = require('../lib/ChangeSet');
+var Change = require('../lib/Change');
 
-describe('ChangeLog', function() {
+describe('ChangeSet', function() {
 
 	var redis;
-	var changeControl;
+	var changeSet;
 	var logger = { info: function() {}, error: function() {} }	
 
 	before(function(done) {
 		redis = require('redis').createClient();
- 		changeControl = ChangeControl(redis, { logger: logger });			
 		done();
-	})
+	});
 
 	beforeEach(function(done) {
 		redis.flushdb(done);		
@@ -43,7 +43,7 @@ describe('ChangeLog', function() {
 	it('should execute all changes', function(done) {
 		var change1 = getChange('test:a')
 		var change2 = getChange('test:b')		
-		var changeSet = changeControl.changeSet('test');
+		var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 		changeSet.add(change1);
 		changeSet.add(change2);
 		changeSet.execute('*', function(err, next) {
@@ -57,7 +57,7 @@ describe('ChangeLog', function() {
 	it('should execute the specified change', function(done) {
 		var change1 = getChange('test:a')
 		var change2 = getChange('test:b')		
-		var changeSet = changeControl.changeSet('test');
+		var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 		changeSet.add(change1);
 		changeSet.add(change2);
 		changeSet.execute('test:a', function(err, next) {
@@ -71,7 +71,7 @@ describe('ChangeLog', function() {
 	it('should execute the specified change', function(done) {
 		var change1 = getChange('test:a')
 		var change2 = getChange('test:b')		
-		var changeSet = changeControl.changeSet('test');
+		var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 		changeSet.add(change1);
 		changeSet.add(change2);
 		changeSet.execute('test:a', function(err, next) {
@@ -83,11 +83,11 @@ describe('ChangeLog', function() {
 	})
 
 	it('should abort execution if a change has been modified', function(done) {
-		redis.hset('changecontrol:changelog:change:test:b', 'checksum', 'foobar', function(err) {
+		redis.hset('prefix:changelog:change:test:b', 'checksum', 'foobar', function(err) {
 			if (err) return done(err);
 			var change1 = getChange('test:a')
 			var change2 = getChange('test:b')		
-			var changeSet = changeControl.changeSet('test');
+			var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 			changeSet.add(change1);
 			changeSet.add(change2);
 			changeSet.execute('test:*', function(err, next) {
@@ -106,7 +106,8 @@ describe('ChangeLog', function() {
 			next();
 		};
 
-		var change = changeControl.change(id, script, options);
+		var defaults = { prefix: 'prefix', redis: redis, logger: logger }
+		var change = Change.create(id, script, _.defaults(options || {}, defaults));
 		change.invocations = function() {
 			return invocations.count;
 		}

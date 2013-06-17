@@ -1,51 +1,57 @@
-var rootpath = process.cwd() + '/',
-    _ = require('underscore'),
-    async = require('async'),    
-    path = require('path'),
-    fs = require("fs"),
-    ChangeControl = require(rootpath + 'lib/ChangeControl').ChangeControl;
+var rootpath = process.cwd() + '/';
+var _ = require('underscore');
+var async = require('async');   
+var path = require('path');
+var fs = require("fs");
+var ChangeControl = require(rootpath + 'lib/index');
 
 var argv = processArgs();
 var redis = require('redis').createClient();
-var changeControl = ChangeControl(redis, { logger: console });
-var changeLog = changeControl.changeLog();
 var mode = argv.m;
 var changeId = argv.c;
-var changeSets = getChangeSets();
+var prefix = argv.p;
+var changeLog = require('../lib/ChangeLog').create(prefix, redis);
 
-var api = {
-	'clear': _.partial(changeLog.clear, changeId),
-	'dump': _.partial(changeLog.dump),
-	'unlock': _.partial(changeLog.unlock, true),
-	'pretend': executeChangeSets,
-	'execute': executeChangeSets,
-	'sync': executeChangeSets
-}
+function run() {
 
-var operation = api[mode];
-if (!operation) {
-	console.error("Failed: " + mode + " is not a valid mode");
-	process.exit(1);
-}
+    var api = {
+        'clear': async.apply(changeLog.clear, changeId),
+        'dump': async.apply(changeLog.dump),
+        'unlock': async.apply(changeLog.unlock, true),
+        'pretend': executeChangeSets,
+        'execute': executeChangeSets,
+        'sync': executeChangeSets
+    };
 
-operation(function(err) {
-	if (err) console.error("Failed: " + err.message);
-	else console.info("Finished");
-	process.exit(err ? 1 : 0);					
-})
+    var operation = api[mode];
+    if (!operation) {
+        console.error("Failed: " + mode + " is not a valid mode");
+        process.exit(1);
+    };
 
-function getChangeSets() {
-  var baseDir = __dirname + "/changes/";
-  return _.reduce(fs.readdirSync(baseDir), function(results, file) {
-    return results.concat(require(baseDir + file).changeSet(changeControl, redis))
-  }, [])
+    operation(function(err) {
+        if (err) console.error("Failed: " + err.message);
+        else console.info("Done".green);
+        process.exit(err ? 1 : 0);                  
+    });
 };
 
 function executeChangeSets(next) {
-  async.eachSeries(changeSets, function(changeSet, callback) {
-    changeSet[mode](changeId, callback)
-  }, next)
-}
+
+    var changeSets = (function() {
+        var baseDir = __dirname + "/changes/";
+        return _.reduce(fs.readdirSync(baseDir), function(results, file) {
+            return results.concat(require(baseDir + file).init(redis, changeLog))
+        }, []);
+    })();
+
+    async.eachSeries(changeSets, function(changeSet, callback) {
+        changeSet[mode](changeId, callback)
+    }, next)
+};
+
+run();
+
 
 function processArgs() {
 	return require('optimist')
@@ -56,5 +62,8 @@ function processArgs() {
 	    .describe('c', 'Change id (optional, valid for execute|pretend|sync|clear)')
 	    .alias('c', 'change')
 	    .default('c', '*')
+        .describe('p', 'The prefix to use to scope the changelog')
+        .alias('p', 'prefix')
+        .default('p', 'changecontrol')
 	    .argv;
 }

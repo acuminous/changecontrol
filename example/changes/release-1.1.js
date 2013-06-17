@@ -1,14 +1,16 @@
-exports.changeSet = function(changeControl, redis) {
+var ChangeSet = require('../../lib/ChangeSet');
 
-  var changeSet = changeControl.changeSet('release-1.1');     
-    
-  changeSet.add('init:pirates', function(next) {
-    var multi = redis.multi();
-    multi.mset(
-      'Captain Jack Sparrow', 'The Black Pearl'
-    );
-    multi.exec(next);
-  });
+exports.init = function(redis, changeLog) {
 
-  return changeSet;
+    var changeSet = ChangeSet.create('release-1.1', changeLog);     
+
+    changeSet.add('init:pirates', function(next) {
+        var multi = redis.multi();
+        multi.mset(
+            'Captain Jack Sparrow', 'The Black Pearl'
+        );
+        multi.exec(next);
+    });
+
+    return changeSet;
 };

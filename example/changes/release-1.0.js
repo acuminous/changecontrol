@@ -1,8 +1,10 @@
-exports.changeSet = function(changeControl, redis) {
+var ChangeSet = require('../../lib/ChangeSet');
 
-	var changeSet = changeControl.changeSet('release-1.0');	  	
+exports.init = function(redis, changeLog) {
+
+	var changeSet = ChangeSet.create('release-1.0', changeLog);	  	
   	
-  changeSet.add('init:foo:bar', function(next) {
+	changeSet.add('init:foo:bar', function(next) {
 		redis.set('foo:bar', 'a', next);
 	});
 

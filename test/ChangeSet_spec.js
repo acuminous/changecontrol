@@ -19,12 +19,14 @@ var _ = require('underscore');
 var async = require('async');
 var os = require("os");
 var ChangeSet = require('../lib/ChangeSet');
+var ChangeLog = require('../lib/ChangeLog');
 var Change = require('../lib/Change');
 
 describe('ChangeSet', function() {
 
 	var redis;
 	var changeSet;
+	var changeLog;
 	var logger = { info: function() {}, error: function() {} }	
 
 	before(function(done) {
@@ -33,7 +35,8 @@ describe('ChangeSet', function() {
 	});
 
 	beforeEach(function(done) {
-		changeSet = ChangeSet.create('test', redis, { prefix: 'prefix', logger: logger });		
+		changeLog = ChangeLog.create('prefix', redis, { logger: logger });
+		changeSet = ChangeSet.create('test', changeLog, { logger: logger });		
 		redis.flushdb(done);		
 	})
 

@@ -4,7 +4,7 @@
   "version": "0.0.4",
   "author": "Stephen Cresswell <scresswell@acuminous.co.uk>",
   "description": "a change control library for node",
-  "main": "./lib/ChangeControl",    
+  "main": "./lib/index",    
   "repository": {
     "type": "git",
     "url": "https://github.com/acuminous/changecontrol.git"

@@ -42,10 +42,8 @@ describe('ChangeSet', function() {
 	}) 		
 
 	it('should execute all changes', function(done) {
-		var change1 = getChange('test:a')
-		var change2 = getChange('test:b')		
-		changeSet.add(change1);
-		changeSet.add(change2);
+		var change1 = getChange('a')
+		var change2 = getChange('b')		
 		changeSet.execute('*', function(err, next) {
 			if (err) return done(err);
 			assert.equal(change1.invocations(), 1);
@@ -55,10 +53,8 @@ describe('ChangeSet', function() {
 	})
 
 	it('should execute the specified change', function(done) {
-		var change1 = getChange('test:a')
-		var change2 = getChange('test:b')		
-		changeSet.add(change1);
-		changeSet.add(change2);
+		var change1 = getChange('a')
+		var change2 = getChange('b')		
 		changeSet.execute('test:a', function(err, next) {
 			if (err) return done(err);
 			assert.equal(change1.invocations(), 1);
@@ -67,26 +63,11 @@ describe('ChangeSet', function() {
 		})
 	})	
 
-	it('should execute the specified change', function(done) {
-		var change1 = getChange('test:a')
-		var change2 = getChange('test:b')		
-		changeSet.add(change1);
-		changeSet.add(change2);
-		changeSet.execute('test:a', function(err, next) {
-			if (err) return done(err);
-			assert.equal(change1.invocations(), 1);
-			assert.equal(change2.invocations(), 0);
-			done();
-		})
-	})
-
 	it('should abort execution if a change has been modified', function(done) {
 		redis.hset('prefix:changelog:change:test:b', 'checksum', 'foobar', function(err) {
 			if (err) return done(err);
-			var change1 = getChange('test:a')
-			var change2 = getChange('test:b')		
-			changeSet.add(change1);
-			changeSet.add(change2);
+			var change1 = getChange('a')
+			var change2 = getChange('b')		
 			changeSet.execute('test:*', function(err, next) {
 				assert.equal(err.message, '\u001b[36mtest:b\u001b[39m has been modified');
 				assert.equal(change1.invocations(), 0);
@@ -104,7 +85,7 @@ describe('ChangeSet', function() {
 		};
 
 		var defaults = { prefix: 'prefix', redis: redis, logger: logger }
-		var change = Change.create(id, script, _.defaults(options || {}, defaults));
+		var change = changeSet.add(id, script, _.defaults(options || {}, defaults));
 		change.invocations = function() {
 			return invocations.count;
 		}

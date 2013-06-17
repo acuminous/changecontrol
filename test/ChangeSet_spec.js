@@ -33,7 +33,7 @@ describe('ChangeSet', function() {
 	});
 
 	beforeEach(function(done) {
-		changeSet = ChangeSet.create('test', redis, { logger: logger });		
+		changeSet = ChangeSet.create('test', redis, { prefix: 'prefix', logger: logger });		
 		redis.flushdb(done);		
 	})
 
@@ -45,7 +45,7 @@ describe('ChangeSet', function() {
 		var change1 = getChange('a')
 		var change2 = getChange('b')		
 		changeSet.execute('*', function(err, next) {
-			if (err) return done(err);
+			assert.ifError(err);
 			assert.equal(change1.invocations(), 1);
 			assert.equal(change2.invocations(), 1);
 			done();
@@ -56,7 +56,7 @@ describe('ChangeSet', function() {
 		var change1 = getChange('a')
 		var change2 = getChange('b')		
 		changeSet.execute('test:a', function(err, next) {
-			if (err) return done(err);
+			assert.ifError(err);
 			assert.equal(change1.invocations(), 1);
 			assert.equal(change2.invocations(), 0);
 			done();
@@ -65,10 +65,11 @@ describe('ChangeSet', function() {
 
 	it('should abort execution if a change has been modified', function(done) {
 		redis.hset('prefix:changelog:change:test:b', 'checksum', 'foobar', function(err) {
-			if (err) return done(err);
+			assert.ifError(err);
 			var change1 = getChange('a')
 			var change2 = getChange('b')		
 			changeSet.execute('test:*', function(err, next) {
+				assert.ok(err);
 				assert.equal(err.message, '\u001b[36mtest:b\u001b[39m has been modified');
 				assert.equal(change1.invocations(), 0);
 				assert.equal(change2.invocations(), 0);

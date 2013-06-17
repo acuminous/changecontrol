@@ -21,6 +21,8 @@ var async = require('async');
 var os = require("os");
 var logger = { info: function() {}, error: function() {} }
 var Change = require('../lib/Change');
+var ChangeLog = require('../lib/ChangeLog');
+var changeLog;
 var redis;
 var fail = Error('fail');
 
@@ -32,6 +34,7 @@ describe('Change', function() {
     });
 
     beforeEach(function(done) {
+        changeLog = ChangeLog.create('prefix', redis, {logger: logger});              
         redis.flushdb(done);        
     });
 
@@ -82,22 +85,22 @@ describe('Change', function() {
     });
 
     it('should audit change executions', function(done) {
-        var change = getChange('change:test:audit_execution');
+        var change = getChange('test:audit_execution');
 
         change.execute(function(err) {
             assert.ifError(err);        
-            assertAuditEntry('change:test:audit_execution', '2a9537e90994ef147bc24ac1521bd45c', done);
+            assertAuditEntry('test:audit_execution', '2a9537e90994ef147bc24ac1521bd45c', done);
         });
     }); 
 
     it('should abort when the precondition aborts', function(done) {
-        var change = getChange('change:test:precondition_aborts', undefined, {
+        var change = getChange('test:precondition_aborts', undefined, {
             precondition: function(abort, next) { abort() }
         });
 
         change.execute(function(err) {
             assert.equal(change.invocations(), 0);
-            assertNoKey('prefix:changelog:change:test:precondition_aborts', done);
+            assertNoKey('prefix:test:precondition_aborts', done);
         })
     }); 
 
@@ -108,7 +111,7 @@ describe('Change', function() {
         change.execute(function(err) {
             assert.equal(err, fail);
             assert.equal(change.invocations(), 0);
-            assertNoKey('changecontrol:changelog:change:test', done);
+            assertNoKey('prefix:test:precondition_has_errors', done);
         })
     });
 
@@ -161,17 +164,13 @@ describe('Change', function() {
 
     var assertAuditEntry = function(id, checksum, next) {
         var redisKey = 'prefix:changelog:change:' +  id;
-        redis.hmget(
-            redisKey, 
-            'id', 'checksum', 'user', 'timestamp', 
-            function(err, values) {
-                assert.equal(values[0], id);
-                assert.equal(values[1], checksum);
-                assert.notEqual(values[2], '');
-                assert.notEqual(new Date(values[3]).getTime(), NaN);
-                next(err);
-            }
-        )       
+        redis.hmget(redisKey, 'id', 'checksum', 'user', 'timestamp', function(err, values) {
+            assert.equal(values[0], id);
+            assert.equal(values[1], checksum);
+            assert.notEqual(values[2], '');
+            assert.notEqual(new Date(values[3]).getTime(), NaN);
+            next(err);
+        });
     };
 
     var getChange = function(id, script, options) {
@@ -182,8 +181,8 @@ describe('Change', function() {
             next();
         };
 
-        var defaults = { prefix: 'prefix', logger: logger, redis: redis };
-        var change = Change.create(id, script, _.defaults(options || {}, defaults));
+        var defaults = { logger: logger };
+        var change = Change.create(id, script, changeLog, _.defaults(options || {}, defaults));
         change.invocations = function() {
             return invocations.count;
         };

@@ -37,7 +37,7 @@ describe('ChangeLog', function() {
     });
 
     beforeEach(function(done) {
-        changeLog = ChangeLog.create({prefix: 'prefix', redis: redis, renderer: renderer, logger: logger});
+        changeLog = ChangeLog.create('prefix', redis, {renderer: renderer, logger: logger});
         redis.flushdb(done);        
     });
 

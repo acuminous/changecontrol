@@ -17,8 +17,8 @@
 var os = require('os');
 var assert = require('assert');
 var async = require('async');
-var ChangeLogLock = require('../lib/ChangeLogLock');
 var redisFactory = require('redis');
+var ChangeLogLock = require('../lib/ChangeLogLock');
 var logger = { info: function() {}, error: function() {} }
 var redis;
 var lock;
@@ -31,7 +31,7 @@ describe('ChangeLogLock', function() {
     })
 
     beforeEach(function(done) {
-        lock = ChangeLogLock.create({prefix: 'prefix', redis: redis, logger: logger});
+        lock = ChangeLogLock.create('prefix', redis, { logger: logger} );
         redis.flushdb(done);        
     })
 

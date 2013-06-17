@@ -33,6 +33,7 @@ describe('ChangeSet', function() {
 	});
 
 	beforeEach(function(done) {
+		changeSet = ChangeSet.create('test', redis, { logger: logger });		
 		redis.flushdb(done);		
 	})
 
@@ -43,7 +44,6 @@ describe('ChangeSet', function() {
 	it('should execute all changes', function(done) {
 		var change1 = getChange('test:a')
 		var change2 = getChange('test:b')		
-		var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 		changeSet.add(change1);
 		changeSet.add(change2);
 		changeSet.execute('*', function(err, next) {
@@ -57,7 +57,6 @@ describe('ChangeSet', function() {
 	it('should execute the specified change', function(done) {
 		var change1 = getChange('test:a')
 		var change2 = getChange('test:b')		
-		var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 		changeSet.add(change1);
 		changeSet.add(change2);
 		changeSet.execute('test:a', function(err, next) {
@@ -71,7 +70,6 @@ describe('ChangeSet', function() {
 	it('should execute the specified change', function(done) {
 		var change1 = getChange('test:a')
 		var change2 = getChange('test:b')		
-		var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 		changeSet.add(change1);
 		changeSet.add(change2);
 		changeSet.execute('test:a', function(err, next) {
@@ -87,7 +85,6 @@ describe('ChangeSet', function() {
 			if (err) return done(err);
 			var change1 = getChange('test:a')
 			var change2 = getChange('test:b')		
-			var changeSet = ChangeSet.create('test', { redis: redis, logger: logger });
 			changeSet.add(change1);
 			changeSet.add(change2);
 			changeSet.execute('test:*', function(err, next) {

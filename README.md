@@ -22,6 +22,7 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 ## Usage
 
 1. Create a ChangeSet
+
 ```js
 // changes/release-1.0.js
 var ChangeSet = require('changecontrol').ChangeSet;

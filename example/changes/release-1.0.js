@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var ChangeSet = require('../../lib/ChangeSet');
+var ChangeSet = require('../../lib/index').ChangeSet;
 
 exports.init = function(changeLog, redis) {
 

@@ -19,14 +19,15 @@ var _ = require('underscore');
 var async = require('async');   
 var path = require('path');
 var fs = require("fs");
-var ChangeControl = require(rootpath + 'lib/index');
 
 var argv = processArgs();
 var redis = require('redis').createClient();
 var mode = argv.m;
 var changeId = argv.c;
 var prefix = argv.p;
-var changeLog = require('../lib/ChangeLog').create(prefix, redis);
+
+var ChangeControl = require(rootpath + 'lib/index');
+var changeLog = ChangeControl.ChangeLog.create(prefix, redis);
 
 function run() {
 

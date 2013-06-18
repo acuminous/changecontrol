@@ -22,45 +22,44 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 ## Usage
 
 1. Create a ChangeSet
-
-```js
-// changes/release-1.0.js
-var ChangeSet = require('changecontrol').ChangeSet;
-
-exports.init = function(redis, changeLog) {
-
-    var changeSet = ChangeSet.create('release-1.0', changeLog);     
+    ```js
+    // changes/release-1.0.js
+    var ChangeSet = require('changecontrol').ChangeSet;
     
-    changeSet.add('init:foo:bar', function(next) {
-        redis.set('foo:bar', 'a', next);
-    });
-
-    changeSet.add('init:pirates', function(next) {
-        var multi = redis.multi();
-        multi.mset(
-            'Blackbeard', 'Queen Anne\'s Revenge',                  
-            'Long John Silver', 'Hispaniola'
-        );
-        multi.exec(next);
-    });
-
-    return changeSet;
-}; 
-```
+    exports.init = function(redis, changeLog) {
+    
+        var changeSet = ChangeSet.create('release-1.0', changeLog);     
+        
+        changeSet.add('init:foo:bar', function(next) {
+            redis.set('foo:bar', 'a', next);
+        });
+    
+        changeSet.add('init:pirates', function(next) {
+            var multi = redis.multi();
+            multi.mset(
+                'Blackbeard', 'Queen Anne\'s Revenge',                  
+                'Long John Silver', 'Hispaniola'
+            );
+            multi.exec(next);
+        });
+    
+        return changeSet;
+    }; 
+    ```
 1. Initialise the ChangeLog
-```js
-var changeLog = require('changecontrol').ChangeLog.create('my-awesome-project', redis);
-```
+    ```js
+    var changeLog = require('changecontrol').ChangeLog.create('my-awesome-project', redis);
+    ```
 1. Initialise the ChangeSet
-```js
-var changeSet = require('changes/release-1.0').init(changeLog, redis);
-```
+    ```js
+    var changeSet = require('changes/release-1.0').init(changeLog, redis);
+    ```
 1. Execute the ChangeSet
-```js
-changeSet.execute('*', function(err) {
-    console.log("Pieces of Eight");
-})
-```
+    ```js
+    changeSet.execute('*', function(err) {
+        console.log("Pieces of Eight");
+    })
+    ```
 
 In practice you'll (hopefully) want to execute all the ChangeSets found in the 'changes' directory automatically when your application starts. You'll probabably also want a script for testing the changes locally and for unlocking the ChangeLog when something unexpected happens. You'll find a starter for ten in the examples folder.
 

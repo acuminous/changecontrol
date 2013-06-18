@@ -56,7 +56,7 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
     ```
 1. Execute the ChangeSet
     ```js
-    changeSet.execute('*', function(err) {
+    changeSet.execute(function(err) {
         console.log("Pieces of Eight");
     })
     ```
@@ -64,8 +64,7 @@ Once a Change has been recorded in the ChangeLog it typically won't be executed 
 In practice you'll (hopefully) want to execute all the ChangeSets found in the 'changes' directory automatically when your application starts. You'll probabably also want a script for testing the changes locally and for unlocking the ChangeLog when something unexpected happens. You'll find a starter for ten in the examples folder.
 
 ### Targetting specific changes
-You may have noticed the odd '*' parameter to the changeSet.execute method. This tells the ChangeSet to execute every change. You can modify this parameter to be more specific about the change(s) you want to execute, e.g.
-
+You can add a parameter to changeSet.execute to be more specific about the change(s) you want to execute, e.g.
 ```js
 changeSet.execute('init:pirates:*', function(err) {
     console.log("Pieces of Eight");

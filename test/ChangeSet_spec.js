@@ -55,6 +55,17 @@ describe('ChangeSet', function() {
 		})
 	})
 
+	it('should default to executing all changes', function(done) {
+		var change1 = getChange('a')
+		var change2 = getChange('b')		
+		changeSet.execute(function(err, next) {
+			assert.ifError(err);
+			assert.equal(change1.invocations(), 1);
+			assert.equal(change2.invocations(), 1);
+			done();
+		})
+	})	
+
 	it('should execute the specified change', function(done) {
 		var change1 = getChange('a')
 		var change2 = getChange('b')		
